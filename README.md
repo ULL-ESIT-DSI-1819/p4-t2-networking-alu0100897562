@@ -93,4 +93,19 @@ Ejecutamos el programa como siempre, y esta vez veremos desde el cliente nuestro
 ![Fallo al cargar la imagen](/img/2-watcher_json_test.png)
 
 # Creando Conexiones de Socket Cliente
-asdasd
+Ya que durante esta práctica hemos estado aprendiendo sobre el lado del servidor, es hora de implementar un programa cliente para recibir mensajes JSON desde nuestro servidor.
+
+Para ello escribimos el siguiente código en un nuevo fichero *net-watcher-json-client.js*:
+
+![Fallo al cargar la imagen](/img/3-watcher_client.png)
+
+Este pequeño programa usa **net.connect** para crear una conexión cliente al puerto 60300 de la máquina local, y luego espera por datos. El objeto **client** es un **Socket**, al igual que el objeto **connection** que vimos en el servidor.
+
+Cuando un evento de **data** ocurre, la callback recibe el objeto JSON, lo parsea y muestra por consola el mensaje adecuado al objeto recibido.
+
+Probamos el programa, evidentemente ejecutando también el servidor y haciendo un touch en el fichero vigilado:
+
+![Fallo al cargar la imagen](/img/3-watcher_client_test.png)
+
+# Comprobando el Funcionamiento de una Aplicación de Red
+asdas
