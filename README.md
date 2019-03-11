@@ -135,3 +135,66 @@ Si probamos qué pasa cuando ejecutamos este servidor y tratamos de conectarnos 
 El mensaje de error *Unexpected end of JSON input* nos indica que efectivamente, estamos tratando de parsear un mensaje JSON incompleto. Con esto hemos simulado correctamente el caso de error al enviar un mensaje dividido a nuestro cliente, lo siguiente será arreglarlo.
 
 # Extendiendo Clases Principales a Módulos Personalizados
+Visto el fallo expuesto en el apartado anterior, concluimos que el cliente tiene dos responsabilidades: acumular en un buffer los mensajes que va recibiendo y gestionar cada mensaje cuando llega.
+
+En lugar de programar directamente estas funcionalidades, lo ideal es convertir al menos una de ellas en un módulo Node.js. Vamos a crear un módulo que gestiona el buffering de entrada para que el programa principal pueda obtener los mensajes completos, por lo que necesitaremos también hablar de los *Módulos Personalizados* y las *Extensiones de Clases Principales* en Node.
+
+## Extendiendo EventEmitter
+Para que el programa no tenga que leer mensajes JSON divididos, implementaremos un módulo para un buffer LDJ cliente que incluiremos en nuestro programa.
+
+Con el siguiente código creamos una clase **LDJClient** que hereda de **EventEmitter**:
+
+![Fallo al cargar la imagen](/img/5-ldj-client.png)
+
+- Al ser una clase, al ser invocada por otro código se debe llamar de la forma **new LDJClient(stream)** para obtener una instancia de la misma. El parámetro **stream** que se le pasa es un objeto que emite eventos de **data**, al igual que una conexión **Socket**.
+
+- En el constructor llamamos a **super** para invocar el constructor de la clase de la que hereda, **EventEmitter**. Usar *super* cuando se está implementando el constructor de una clase que hereda de otra es una buena práctica a seguir.
+
+- La forma de instanciar un objeto de esta clase sería la siguiente:
+
+![Fallo al cargar la imagen](/img/5-ldj-client-instance.png)
+
+Con esto todavía no hemos implementado nada para emitir mensajes de eventos, así que en los siguientes apartados lo veremos y hablaremos sobre el *buffering* de eventos de datos en Node.
+
+## Buffering de Data Events
+Vamos a usar el parámetro **stream** que se le pasa a nuestra clase para recoger y almacenar en un buffer las entradas. El objetivo es recoger los datos entrantes desde el stream y convertirlos en eventos **message** que contienen los mensajes objeto parseados.
+
+Modificamos el constructor de la siguiente manera:
+
+![Fallo al cargar la imagen](/img/5-ldj-client-2.png)
+
+- Al igual que antes, empezamos llamando a **super**, para luego crear una variable string **buffer** donde se almacenará la información entrante.
+- Luego usamos **stream.on** para gestionar los eventos data.
+- Dentro de estos eventos, añadimos al buffer los datos *en crudo* y buscamos mensajes completos (llegando a un caracter *'\n'*). 
+- Cada string con el mensaje pasa a través de **JSON.parse** y finalmente se emite desde la clase como un **message** vía **this.emit**.
+
+Con esto resolvemos el problema inicial del manejo de mensajes divididos, solo nos queda añadir esta clase a un Módulo Node.js para que nuestro cliente pueda usarla.
+
+## Exportando funcionalidades a un Módulo
+Ya que nuestro módulo será una librería a la que accede nuestro programa, por convención, debemos almacenar el fichero en un directorio **lib** dentro de nuestro proyecto.
+
+Añadimos lo siguiente al código de la clase:
+
+![Fallo al cargar la imagen](/img/5-ldj-client-module.png)
+
+- Dentro de la definición de la clase, tras el constructor, añadimos un método **static** llamado **connect**. Un método *static* se asocia a la clase LDJClient en sí, no a las instancias individuales de la misma. 
+- El método **connect** simplemente ahorra a los usuarios de la librería el tener que instanciar la clase manualmente.
+- El objeto **module.exports** que se añade tras la definición de la clase es nuestro nexo de unión con el exterior. Todo lo que se añada a *exports* podrá ser usado desde el código que lo invoque, en este caso añadimos la clase LDJClient completa.
+- Para invocar este módulo usamos el método *connect* de la siguiente manera, añadiendo la ruta al fichero fuente:
+
+![Fallo al cargar la imagen](/img/5-ldj-client-module-instance.png)
+
+Ahora que tenemos nuestro módulo completo, pasamos a usarlo desde el cliente.
+
+## Importando un Módulo Node.js Personalizado
+Vamos a crear un nuevo programa cliente con el siguiente código:
+
+![Fallo al cargar la imagen](/img/5-net-watcher-ldj-client.png)
+
+Es muy similar a nuestro cliente previo, solo que en lugar de enviar los mensajes a **JSON.parse**, confiamos en nuestro módulo para producir los mensajes.
+
+Para comprobar su funcionamiento, vamos a usar de nuevo nuestro servidor simulado e intentar conectarnos desde este cliente:
+
+![Fallo al cargar la imagen](/img/5-net-watcher-ldj-client-test.png)
+
+Como podemos ver, problema solucionado.
