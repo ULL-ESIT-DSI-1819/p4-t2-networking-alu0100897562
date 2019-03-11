@@ -108,4 +108,30 @@ Probamos el programa, evidentemente ejecutando también el servidor y haciendo u
 ![Fallo al cargar la imagen](/img/3-watcher_client_test.png)
 
 # Comprobando el Funcionamiento de una Aplicación de Red
-asdas
+Los Test Funcionales sirven para asegurarnos de que nuestro código hace exactamente lo que esperamos. En esta sección desarrollaremos un test para nuestro servicio de vigilancia de ficheros en red, tanto para el servidor como para el cliente. Simularemos un servidor ajustado a nuestro protocolo LDJ mientras exponemos debilidades en el cliente.
+
+Tras escribir la prueba, arreglaremos el código del cliente para que pueda pasarla.
+
+## Entendiendo el problema del Límite de Mensaje
+Al desarrollar programas de red con Node.js, estos se suelen comunicar mediante mensajes, que pueden llegar enteros de una vez o divididos en distintos eventos.
+
+En nuestro protocolo LDJ, el límite que se establece entre dos mensajes es el caracter de salto de línea (*\n*). ¿Qué pasaría si un mensaje fuera partido a la mitad y llegara al cliente como dos eventos *data* separados? Cosas como esta pueden pasar en la red, sobre todo cuando se trata de mensajes largos.
+
+Vamos a crear un servicio de prueba que envíe mensajes divididos a nuestro cliente para ver cómo responde.
+
+## Implementando un Servicio de Prueba
+Desarrollar aplicaciones Node.js robustas implica lidiar de forma elegante con todos estos posibles problemas de red como mensajes entrantes divididos, caídas de conexión o errores en los datos. 
+
+Con el siguiente código implementamos un servicio de prueba que divide un mensaje en varios trozos:
+
+![Fallo al cargar la imagen](/img/4-test_service.png)
+
+Como se puede ver, lo único que hace es simular el servidor desarrollado anteriormente, solo que lo único que hace es enviar un mensaje dividido en dos trozos.
+
+Si probamos qué pasa cuando ejecutamos este servidor y tratamos de conectarnos con nuestro programa cliente:
+
+![Fallo al cargar la imagen](/img/4-test_failed.png)
+
+El mensaje de error *Unexpected end of JSON input* nos indica que efectivamente, estamos tratando de parsear un mensaje JSON incompleto. Con esto hemos simulado correctamente el caso de error al enviar un mensaje dividido a nuestro cliente, lo siguiente será arreglarlo.
+
+# Extendiendo Clases Principales a Módulos Personalizados
