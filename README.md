@@ -297,3 +297,8 @@ Modificamos el código añadiendo un manejador de eventos a la espera de una se�
 - **¿Debería LDJClient emitir un evento *close* a sus *listeners*?¿En qué circunstancias?**
 
 ¿Cuando el stream de entrada sea null?
+
+
+# Badge de Travis 
+
+[![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-alu0100897562.svg?branch=master)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-alu0100897562)
