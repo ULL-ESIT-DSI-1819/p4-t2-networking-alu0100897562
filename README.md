@@ -198,3 +198,51 @@ Para comprobar su funcionamiento, vamos a usar de nuevo nuestro servidor simulad
 ![Fallo al cargar la imagen](/img/5-net-watcher-ldj-client-test.png)
 
 Como podemos ver, problema solucionado.
+
+# Desarrollando Tests Unitarios con Mocha
+Mocha es framework de pruebas multiparadigma para Node.js, uno de los más usados por los desarrolladores. Aunque incluye distintos estilos para describir las pruebas, nos centraremos en las Desarrollo Dirigido por Comportamiento (Behavior-driven development - **BDD**). Lo instalaremos con el gestor de paquetes de node, **npm**, visto en anteriores prácticas.
+
+## Semántica del Versionado de Paquetes
+Como breve inciso, una explicación rápida del Versionado de Paquetes de software. Es una convención que consiste en numerar la versión del paquete con tres dígitos separados por puntos, de derecha a izquierda:
+
+- Si los cambios en el código no introducen ni eliminan ninguna funcionalidad, solo corrigen pequeñas fallas, etc, entonces se incrementa el número **patch**.
+- Si los cambios introducen alguna funcionalidad pero no alteran la existente, entonces se incrementa el número **minor** y se reinicia el patch.
+- Si el código rompe con las funcionalidades previas de alguna forma, entonces se incrementa el número **major** y se reinicia el resto.
+
+## Escribiendo Pruebas Unitarias con Mocha
+Una vez instalado Mocha, vamos a usarlo para desarrollar pruebas unitarias para nuestro código. Creamos un subdirectorio **test** donde almacenaremos nuestro código relacionado con las pruebas siguiendo la convención de Node.js.
+
+Dentro del directorio, creamos el fichero *ldj-client-test.js* con el siguiente contenido:
+
+![Fallo al cargar la imagen](/img/6-ldj-client-test.png)
+
+- De entre los módulos que cargamos al principio, la novedad es el módulo **assert**. Contiene funciones de interés para comparar valores.
+- Usamos el método **describe** de Mocha para darle un **contexto** a nuestras pruebas, en este caso, sobre nuestro LDJClient. El segundo argumento que se le pasa al método es una callback que contiene todas las pruebas.
+- Dentro del contexto declaramos dos variables, una es la instancia de la clase LDJClient y otra un EventEmitter, para luego actualizar las instancias en el **beforeEach** antes de cada prueba.
+- Dado que la clase es **asíncrona** por naturaleza, invocamos la callback de **done** que provee Mocha para que indique cuándo se ha finalizado la prueba.
+- En el cuerpo de la prueba, preparamos un manejador de eventos **message**  sobre el cliente. Este manejador usa el método **deepEqual** para comprobar que el *payload* recibido cumple nuestras expectativas. 
+- Finalmente emitimos el evento.
+
+Ya tenemos el código, es hora de ejecutarlo.
+
+## Ejecutando Pruebas Mocha desde npm
+Para ejecutar las pruebas de Mocha desde npm, necesitamos modificar la sección *scripts* del fichero **package.json** (que creamos previamente con *npm init -y*. Tras ejecutar este comando, se habrá generado un directorio **node_modules** en nuestro proyecto, que contiene las dependencias de Mocha, además de haberse actualizado *package.json* con estas.) para que contenga lo siguiente:
+
+![Fallo al cargar la imagen](/img/6-package.png)
+
+Las entradas de la sección *scripts* son comandos que puedes invocar desde línea de comandos cuando se está usando **npm run**. Al ejecutar *npm run test*, ahora que hemos modificado la entrada, se ejecutará Mocha:
+
+![Fallo al cargar la imagen](/img/6-npm_test.png)
+
+Como vemos, hemos superado la prueba que escribimos.
+
+## Añadiendo más Pruebas Asíncronas
+Siguiendo esta estructura, podemos añadir también la prueba que hicimos previamente para comprobar el comportamiento del cliente frente a mensajes divididos a Mocha. Añadimos lo siguiente dentro del bloque **describe**:
+
+![Fallo al cargar la imagen](/img/6-client_test.png)
+
+Hace lo mismo que nuestro fichero *test-json-service.js* de una forma más simple, dividiendo el mensaje en dos usando el método **process.nextTick** para ejecutar el siguiente código como una callback que se ejecuta desde que termina el código previo.
+
+Otra forma de programar este *delay* es usar **setTimeout(callback,nºsegundos)**.
+
+# Ejercicios Finales
