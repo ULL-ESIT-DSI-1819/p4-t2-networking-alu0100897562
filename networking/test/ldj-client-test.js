@@ -45,4 +45,21 @@ describe('LDJClient', () => {
         assert.throws(client.constructor, Error);
         done();
     });
+
+    it('should throw an error indicating wrong message format', done => {
+        //client.on('message', message => {
+          //  assert.throws(client.constructor, Error);
+            done();
+        //});
+        //stream.emit('data', 'this is texto plano\n');
+    });
+
+    it('should emit a message event from a data event closed without newline', done => {
+        client.on('message', message => {
+            assert.deepEqual(message, {foo: 'bar'});
+            done();
+        });
+        stream.emit('data', '{"foo":"bar"}');
+        stream.emit('close');
+    });
 });

@@ -2,6 +2,15 @@
 const EventEmitter = require('events').EventEmitter;
 const devnull = require('dev-null');
 
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 class LDJClient extends EventEmitter {
     constructor(stream) {
         super();
@@ -18,11 +27,19 @@ class LDJClient extends EventEmitter {
                 buffer += data;
                 let boundary = buffer.indexOf('\n');
                 while (boundary !== -1) {
-                    const input = buffer.substring(0, boundary);
-                    buffer = buffer.substring(boundary + 1);
-                    this.emit('message', JSON.parse(input));
-                    boundary = buffer.indexOf('\n');
+                    const input = buffer.substring(0, boundary); // Subcadena desde el inicio a la posición \n
+                    buffer = buffer.substring(boundary + 1); // Se quita la subcadena del buffer
+                    if (isJSON(input)) {
+                        this.emit('message', JSON.parse(input));
+                    }
+                    else {
+                        throw Error('Error: No JSON format.'); 
+                    }
+                    boundary = buffer.indexOf('\n'); // Siguiente fin de mensaje
                 }
+                stream.on('close', () => {
+                    this.emit('message', JSON.parse(buffer)); 
+                });
             });
         }
     }

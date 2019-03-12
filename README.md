@@ -249,6 +249,7 @@ Otra forma de programar este *delay* es usar **setTimeout(*callback*, *nºsegund
 ## Testability
 **Implementar los tests adicionales:**
 - **Paso de un mensaje que se divide en dos o más eventos *data* desde el *stream*.**
+
 Implementadas las pruebas para recibir un mensaje dividido en dos y tres fragmentos:
 
 ![Fallo al cargar la imagen](/img/7-ej1-a.png)
@@ -271,8 +272,28 @@ Implementadas las pruebas para recibir un mensaje dividido en dos y tres fragmen
 
 ## Robustness
 **Mejoras en la robustez de la clase LDJClient:**
-- **¿Qué ocurre si el mensaje que se recibe no está en formato JSON? Escribir una prueba que envíe un mensaje que no sea JSON y modificar el código para poder superarla.**
+- **¿Qué ocurre si el evento *data* que se recibe no está en formato JSON? Escribir una prueba que envíe un mensaje que no sea JSON y modificar el código para poder superarla.**
 
--**¿Qué ocurre si el mensaje está en formato JSON pero no contiene el caracter *'\n'* para delimitar cada mensaje? Escribir una prueba que envíe un evento *data* JSON sin el caracter salto de línea, seguido de un evento *close*. Las instancias de *Stream* emiten un evento *close* cuando se desconectan, modifica LDJClient para estar a la escucha de este evento y procesar el resto de buffer.**
+Si el evento no está en formato JSON, *JSON.parse* lanzará una excepción. Escribimos un test que espere que gestionemos este error:
+
+![Fallo al cargar la imagen](/img/7-ej2-a.png)
+
+- Me pasa lo mismo que con el throw del ejercicio anterior...
+
+- **¿Qué ocurre si el mensaje está en formato JSON pero no contiene el caracter *'\n'* para delimitar cada mensaje? Escribir una prueba que envíe un evento *data* JSON sin el caracter salto de línea, seguido de un evento *close*. Las instancias de *Stream* emiten un evento *close* cuando se desconectan, modifica LDJClient para estar a la escucha de este evento y procesar el resto de buffer.**
+
+Tal como está implementada la clase, al no recibir un caracter *'\n'*, el constructor no hace nada más que acumular los datos en crudo, ya que depende de buscar este caracter para identificar cada mensaje, sacarlo del buffer y enviarlo con *emit* convertido en objeto JSON. 
+
+Tampoco tenemos ningún manejador de eventos a la escucha de una señal *close*, por lo que no haría nada con la señal close enviada en la prueba:
+
+![Fallo al cargar la imagen](/img/7-ej2-b-test.png)
+
+Modificamos el código añadiendo un manejador de eventos a la espera de una señal *close* dentro del evento de *data* de la siguiente forma:
+
+![Fallo al cargar la imagen](/img/7-ej2-b.png)
+
+![Fallo al cargar la imagen](/img/7-ej2-pass.png)
 
 - **¿Debería LDJClient emitir un evento *close* a sus *listeners*?¿En qué circunstancias?**
+
+¿Cuando el stream de entrada sea null?
