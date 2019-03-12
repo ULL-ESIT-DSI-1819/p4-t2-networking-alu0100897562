@@ -239,10 +239,40 @@ Como vemos, hemos superado la prueba que escribimos.
 ## Añadiendo más Pruebas Asíncronas
 Siguiendo esta estructura, podemos añadir también la prueba que hicimos previamente para comprobar el comportamiento del cliente frente a mensajes divididos a Mocha. Añadimos lo siguiente dentro del bloque **describe**:
 
-![Fallo al cargar la imagen](/img/6-client_test.png)
+![Fallo al cargar la imagen](/img/6-client-test.png)
 
 Hace lo mismo que nuestro fichero *test-json-service.js* de una forma más simple, dividiendo el mensaje en dos usando el método **process.nextTick** para ejecutar el siguiente código como una callback que se ejecuta desde que termina el código previo.
 
-Otra forma de programar este *delay* es usar **setTimeout(callback,nºsegundos)**.
+Otra forma de programar este *delay* es usar **setTimeout(*callback*, *nºsegundos*)**.
 
 # Ejercicios Finales
+## Testability
+**Implementar los tests adicionales:**
+- **Paso de un mensaje que se divide en dos o más eventos *data* desde el *stream*.**
+Implementadas las pruebas para recibir un mensaje dividido en dos y tres fragmentos:
+
+![Fallo al cargar la imagen](/img/7-ej1-a.png)
+
+![Fallo al cargar la imagen](/img/7-ej1-a-test.png)
+
+- **Pasar **null** al constructor de **LDJClient** y comprobar que se lanza un error. Modificar el código del constructor para que se pueda pasar la prueba.**
+
+- Apartado pendiente -
+- ¿Por qué funciona el test si se supone que espera que se lance un error?
+- ¿Por qué al descomentar el throw da un error y no pasa el test?
+
+![Fallo al cargar la imagen](/img/7-ej1-b.png)
+
+![Fallo al cargar la imagen](/img/7-ej1-b-fail.png)
+
+![Fallo al cargar la imagen](/img/7-ej1-b-2.png)
+
+![Fallo al cargar la imagen](/img/7-ej1-b-pass.png)
+
+## Robustness
+**Mejoras en la robustez de la clase LDJClient:**
+- **¿Qué ocurre si el mensaje que se recibe no está en formato JSON? Escribir una prueba que envíe un mensaje que no sea JSON y modificar el código para poder superarla.**
+
+-**¿Qué ocurre si el mensaje está en formato JSON pero no contiene el caracter *'\n'* para delimitar cada mensaje? Escribir una prueba que envíe un evento *data* JSON sin el caracter salto de línea, seguido de un evento *close*. Las instancias de *Stream* emiten un evento *close* cuando se desconectan, modifica LDJClient para estar a la escucha de este evento y procesar el resto de buffer.**
+
+- **¿Debería LDJClient emitir un evento *close* a sus *listeners*?¿En qué circunstancias?**
