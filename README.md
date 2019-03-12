@@ -292,7 +292,7 @@ Modificamos el código añadiendo un manejador de eventos a la espera de una se�
 
 ![Fallo al cargar la imagen](/img/7-ej2-b.png)
 
-![Fallo al cargar la imagen](/img/7-ej2-pass.png)
+![Fallo al cargar la imagen](/img/7-ej2-b-pass.png)
 
 - **¿Debería LDJClient emitir un evento *close* a sus *listeners*?¿En qué circunstancias?**
 
