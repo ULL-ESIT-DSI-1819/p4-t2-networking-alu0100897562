@@ -38,10 +38,7 @@ class LDJClient extends EventEmitter {
         super();
 
         if (stream === null){
-            //throw Error('Error: No message specified.');
-           // process.stderr  // Se queda colgado
-             //   .pipe(devnull())
-               // .write('ERROR: No message specifed.\n');
+            throw Error('Error: No message specified.');
         }
         else {
             let buffer = '';

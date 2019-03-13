@@ -41,17 +41,18 @@ describe('LDJClient', () => {
     });
 
     it('should throw an error when null is passed to the constructor', done => {
-        client = new LDJClient(null);
-        assert.throws(client.constructor, Error);
+        assert.throws(() => {
+            client = new LDJClient(null);
+        });
         done();
     });
 
     it('should throw an error indicating wrong message format', done => {
-        //client.on('message', message => {
-          //  assert.throws(client.constructor, Error);
-            done();
-        //});
-        //stream.emit('data', 'this is texto plano\n');
+        assert.throws(() => {
+            client.on('message', message => { });
+            stream.emit('data', 'this is texto plano\n');
+        });
+        done();
     });
 
     it('should emit a message event from a data event closed without newline', done => {

@@ -1,4 +1,4 @@
 language:
   node_js
 script:
-  cd networking && npm test
+  cd networking && npm i && npm test
