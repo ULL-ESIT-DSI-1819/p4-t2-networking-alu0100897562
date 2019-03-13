@@ -258,17 +258,13 @@ Implementadas las pruebas para recibir un mensaje dividido en dos y tres fragmen
 
 - **Pasar **null** al constructor de **LDJClient** y comprobar que se lanza un error. Modificar el código del constructor para que se pueda pasar la prueba.**
 
-- Apartado pendiente -
-- ¿Por qué funciona el test si se supone que espera que se lance un error?
-- ¿Por qué al descomentar el throw da un error y no pasa el test?
+Al pasarle un evento *null* al constructor, debería devolver un error:
+
+![Fallo al cargar la imagen](/img/7-ej1-b-test.png)
+
+Para que funcione, basta con añadir un *if* al principio del constructor que compruebe que el argumento que se le pasa no es *null*:
 
 ![Fallo al cargar la imagen](/img/7-ej1-b.png)
-
-![Fallo al cargar la imagen](/img/7-ej1-b-fail.png)
-
-![Fallo al cargar la imagen](/img/7-ej1-b-2.png)
-
-![Fallo al cargar la imagen](/img/7-ej1-b-pass.png)
 
 ## Robustness
 **Mejoras en la robustez de la clase LDJClient:**
@@ -278,7 +274,10 @@ Si el evento no está en formato JSON, *JSON.parse* lanzará una excepción. Esc
 
 ![Fallo al cargar la imagen](/img/7-ej2-a.png)
 
-- Me pasa lo mismo que con el throw del ejercicio anterior...
+Lo solucionamos analizando la cadena antes de pasarla a *JSON.parse* y lanzando un error en caso de no estar en el formato correcto:
+
+![Fallo al cargar la imagen](/img/7-ej2-a2.png)
+
 
 - **¿Qué ocurre si el mensaje está en formato JSON pero no contiene el caracter *'\n'* para delimitar cada mensaje? Escribir una prueba que envíe un evento *data* JSON sin el caracter salto de línea, seguido de un evento *close*. Las instancias de *Stream* emiten un evento *close* cuando se desconectan, modifica LDJClient para estar a la escucha de este evento y procesar el resto de buffer.**
 
@@ -294,11 +293,15 @@ Modificamos el código añadiendo un manejador de eventos a la espera de una se�
 
 ![Fallo al cargar la imagen](/img/7-ej2-b-pass.png)
 
-- **¿Debería LDJClient emitir un evento *close* a sus *listeners*?¿En qué circunstancias?**
-
-¿Cuando el stream de entrada sea null?
-
 
 # Badge de Travis 
 
 [![Build Status](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-alu0100897562.svg?branch=master)](https://travis-ci.org/ULL-ESIT-DSI-1819/p4-t2-networking-alu0100897562)
+
+
+# Notas adicionales
+Aspectos que no llegaron a corregírseme en clase por falta de tiempo:
+- Tras trastear en clase con las dependencias de *node_modules*, no conseguí que se pasara la build de Travis correctamente.
+- Gulpfile añadido con la ejecución de las pruebas.
+- Documentación añadida con jsdoc al fichero de la clase LDJClient.
+- Reto conseguido en la hora de clase, aunque al desconectarse un cliente se decrementa su "número de Guest" para que no haya disparidades y no sé si es una forma correcta de proceder.
