@@ -1,2 +1,2 @@
-networking/node_modules/*
-!networking/node_modules/mocha
+node_modules/*
+!node_modules/mocha
